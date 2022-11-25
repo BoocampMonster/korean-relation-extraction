@@ -1,0 +1,6 @@
+*.pt
+*.textClipping
+__pycache__/
+wandb/
+*.DS_Store
+*.csv
