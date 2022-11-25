@@ -25,7 +25,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         if self.mode:
             self.sentence_array, self.entity_hint, self.tokenizer, self.target_array = self._load_data(data, tokenizer)
         else:
-            self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(self.data, self.tokenizer)
+            self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(data, tokenizer)
 
     def _load_data(self, data:pd.DataFrame, tokenizer):
         """_summary_

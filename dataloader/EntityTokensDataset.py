@@ -25,7 +25,7 @@ class EntityTokensDataset(torch.utils.data.Dataset):
         if self.mode:
             self.sentence_array, self.entity_hint, self.tokenizer, self.target_array = self._load_data(data, tokenizer)
         else:
-            self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(self.data, self.tokenizer)
+            self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(data, tokenizer)
 
     def _load_data(self, data:pd.DataFrame, tokenizer):
         """_summary_
@@ -63,17 +63,15 @@ class EntityTokensDataset(torch.utils.data.Dataset):
             return_attention_mask = True,   
             return_tensors = 'pt',
             )
-        
+        entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
+
         if self.mode:              
-            entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1'),
                     'entity_embed1' : entity_embed1,
                     'entity_embed2' : entity_embed2}
-
         else:
-            entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'entity_embed1' : entity_embed1,
@@ -81,12 +79,13 @@ class EntityTokensDataset(torch.utils.data.Dataset):
                     }
 
     
-    def _entity_embedding(self, entity_hint:torch.tensor, sentence:torch.tensor) ->  Tuple[torch.tensor, torch.tensor]:
+    def _entity_embedding(self, entity_hint:tuple, sentence:torch.tensor) ->  Tuple[torch.tensor, torch.tensor]:
         hint1 = self.tokenizer.encode(entity_hint[0], return_tensors='pt', add_special_tokens=False)[0]
         hint2 = self.tokenizer.encode(entity_hint[1], return_tensors='pt', add_special_tokens=False)[0]
+
         entity_embedding1 = []
         entity_embedding2 = []
-        
+
         i = 0
         outbreak = False
         while sentence[i] != self.tokenizer.pad_token_id:
@@ -103,6 +102,7 @@ class EntityTokensDataset(torch.utils.data.Dataset):
                     outbreak = False
                     i += 1
                     continue
+                i += (len(hint1)-1)
 
             elif sentence[i] == hint2[0]:
                 idx_tmp = i
@@ -116,6 +116,7 @@ class EntityTokensDataset(torch.utils.data.Dataset):
                     outbreak = False
                     i += 1
                     continue
+                i += (len(hint2)-1)
             i += 1
             
         return torch.tensor(entity_embedding1[0], dtype=torch.long), torch.tensor(entity_embedding2[0], dtype=torch.long)

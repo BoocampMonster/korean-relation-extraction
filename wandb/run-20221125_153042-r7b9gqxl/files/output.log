@@ -1,0 +1,43 @@
+
+사용할 수 있는 GPU는 1개 입니다.
+==================================================
+현재 적용되고 있는 데이터 클래스는 EntityTokensDataset입니다.
+==================================================
+==================================================
+현재 적용되고 있는 모델 클래스는 EntityTokensModel입니다.
+==================================================
+Some weights of the model checkpoint at klue/roberta-large were not used when initializing RobertaModel: ['lm_head.dense.weight', 'lm_head.layer_norm.weight', 'lm_head.layer_norm.bias', 'lm_head.decoder.weight', 'lm_head.decoder.bias', 'lm_head.dense.bias', 'lm_head.bias']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at klue/roberta-large and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+  0%|                                                                                                                                   | 0/1624 [00:00<?, ?it/s]/opt/conda/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2198: FutureWarning: The `pad_to_max_length` argument is deprecated and will be removed in a future version, use `padding=True` or `padding='longest'` to pad to the longest sequence in the batch, or use `padding='max_length'` to pad to a max length. In this case, you can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to pad to the maximal input size of the model (e.g. 512 for Bert).
+  warnings.warn(
+  0%|                                                                                                                                   | 0/1624 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 104, in <module>
+    main(config_w)
+  File "train.py", line 86, in main
+    trainer.train()
+  File "/opt/ml/Task2-Relation-Extraction/trainer/EntityTokensTrainer.py", line 38, in train
+    self._train_epoch(epoch)
+  File "/opt/ml/Task2-Relation-Extraction/trainer/EntityTokensTrainer.py", line 51, in _train_epoch
+    for i, batch in enumerate(pbar):
+  File "/opt/conda/lib/python3.8/site-packages/tqdm/std.py", line 1171, in __iter__
+    for obj in iterable:
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 435, in __next__
+    data = self._next_data()
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/opt/ml/Task2-Relation-Extraction/dataloader/EntityTokensDataset.py", line 68, in __getitem__
+    entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
+  File "/opt/ml/Task2-Relation-Extraction/dataloader/EntityTokensDataset.py", line 121, in _entity_embedding
+    return torch.tensor(entity_embedding1[0], dtype=torch.long), torch.tensor(entity_embedding2[0], dtype=torch.long)
+IndexError: list index out of range
+==================================================
+현재 적용되고 있는 트레이너는 EntityTokensTrainer입니다.
+==================================================
