@@ -1,0 +1,20 @@
+
+사용할 수 있는 GPU는 1개 입니다.
+==================================================
+현재 적용되고 있는 데이터 클래스는 EntityTokensDataset입니다.
+==================================================
+==================================================
+현재 적용되고 있는 모델 클래스는 EntityTokensModel입니다.
+==================================================
+/opt/conda/lib/python3.8/site-packages/sklearn/model_selection/_split.py:666: UserWarning: The least populated class in y has only 1 members, which is less than n_splits=5.
+  warnings.warn(("The least populated class in y has only %d"
+Traceback (most recent call last):
+  File "train.py", line 103, in <module>
+    main(config_w)
+  File "train.py", line 57, in main
+    model = getattr(Model, config.model.model_class)(
+  File "/opt/ml/seonjongbaseline/model/EntityTokensModel.py", line 15, in __init__
+    self.hidden_size = self.model.config.hidden_size
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 778, in __getattr__
+    raise ModuleAttributeError("'{}' object has no attribute '{}'".format(
+torch.nn.modules.module.ModuleAttributeError: 'EntityTokensModel' object has no attribute 'model'

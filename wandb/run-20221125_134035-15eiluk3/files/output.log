@@ -1,0 +1,21 @@
+
+사용할 수 있는 GPU는 1개 입니다.
+/opt/conda/lib/python3.8/site-packages/sklearn/model_selection/_split.py:666: UserWarning: The least populated class in y has only 1 members, which is less than n_splits=5.
+  warnings.warn(("The least populated class in y has only %d"
+==================================================
+현재 적용되고 있는 데이터 클래스는 EntityTokensDataset입니다.
+==================================================
+==================================================
+현재 적용되고 있는 모델 클래스는 EntityTokensModel입니다.
+==================================================
+Some weights of the model checkpoint at klue/roberta-large were not used when initializing RobertaModel: ['lm_head.dense.bias', 'lm_head.bias', 'lm_head.decoder.bias', 'lm_head.layer_norm.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.weight', 'lm_head.decoder.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at klue/roberta-large and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Traceback (most recent call last):
+  File "train.py", line 103, in <module>
+    main(config_w)
+  File "train.py", line 71, in main
+    trainer = getattr(Trainer, config.model.trainer)(
+TypeError: 'module' object is not callable

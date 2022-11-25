@@ -1,0 +1,82 @@
+{
+    "os": "Linux-4.4.0-59-generic-x86_64-with-glibc2.10",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-11-25T13:40:36.166769",
+    "startedAt": "2022-11-25T13:40:35.604712",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--config",
+        "roberta_large_typed_entity_marker_tokens"
+    ],
+    "state": "running",
+    "program": "train.py",
+    "codePath": "train.py",
+    "host": "f283701e186f",
+    "username": "root",
+    "executable": "/opt/conda/bin/python3",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2200.0839999999994,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.084,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "total": 98.30496215820312,
+        "used": 8.711345672607422
+    },
+    "gpu": "Tesla V100-PCIE-32GB",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "Tesla V100-PCIE-32GB",
+            "memory_total": 34089730048
+        }
+    ],
+    "memory": {
+        "total": 88.50595092773438
+    }
+}

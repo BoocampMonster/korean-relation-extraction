@@ -1,0 +1,60 @@
+
+사용할 수 있는 GPU는 1개 입니다.
+==================================================
+현재 적용되고 있는 데이터 클래스는 EntityTokensDataset입니다.
+==================================================
+==================================================
+현재 적용되고 있는 모델 클래스는 EntityTokensModel입니다.
+==================================================
+/opt/conda/lib/python3.8/site-packages/sklearn/model_selection/_split.py:666: UserWarning: The least populated class in y has only 1 members, which is less than n_splits=5.
+  warnings.warn(("The least populated class in y has only %d"
+Some weights of the model checkpoint at klue/roberta-large were not used when initializing RobertaModel: ['lm_head.layer_norm.bias', 'lm_head.decoder.bias', 'lm_head.decoder.weight', 'lm_head.dense.weight', 'lm_head.bias', 'lm_head.dense.bias', 'lm_head.layer_norm.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at klue/roberta-large and are newly initialized: ['roberta.pooler.dense.weight', 'roberta.pooler.dense.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+  0%|                                                                                                                    | 0/2 [00:00<?, ?it/s]/opt/conda/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2198: FutureWarning: The `pad_to_max_length` argument is deprecated and will be removed in a future version, use `padding=True` or `padding='longest'` to pad to the longest sequence in the batch, or use `padding='max_length'` to pad to a max length. In this case, you can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to pad to the maximal input size of the model (e.g. 512 for Bert).
+  warnings.warn(
+==================================================
+현재 적용되고 있는 트레이너는 EntityTokensTrainer입니다.
+==================================================
+torch.Size([64])
+  0%|                                                                                                                    | 0/2 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "train.py", line 104, in <module>
+    main(config_w)
+  File "train.py", line 86, in main
+    trainer.train()
+  File "/opt/ml/seonjongbaseline/trainer/EntityTokensTrainer.py", line 38, in train
+    self._train_epoch(epoch)
+  File "/opt/ml/seonjongbaseline/trainer/EntityTokensTrainer.py", line 55, in _train_epoch
+    logits = self.model(input_ids = batch["input_ids"].to(self.device),
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/torch/cuda/amp/autocast_mode.py", line 135, in decorate_autocast
+    return func(*args, **kwargs)
+  File "/opt/ml/seonjongbaseline/model/EntityTokensModel.py", line 29, in forward
+    last_hidden_state = self.model(input_ids=input_ids, attention_mask=attention_mask)['last_hidden_state']
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/transformers/models/roberta/modeling_roberta.py", line 843, in forward
+    encoder_outputs = self.encoder(
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/transformers/models/roberta/modeling_roberta.py", line 522, in forward
+    layer_outputs = layer_module(
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/transformers/models/roberta/modeling_roberta.py", line 449, in forward
+    layer_output = apply_chunking_to_forward(
+  File "/opt/conda/lib/python3.8/site-packages/transformers/modeling_utils.py", line 2196, in apply_chunking_to_forward
+    return forward_fn(*input_tensors)
+  File "/opt/conda/lib/python3.8/site-packages/transformers/models/roberta/modeling_roberta.py", line 461, in feed_forward_chunk
+    intermediate_output = self.intermediate(attention_output)
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/modules/module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "/opt/conda/lib/python3.8/site-packages/transformers/models/roberta/modeling_roberta.py", line 363, in forward
+    hidden_states = self.intermediate_act_fn(hidden_states)
+  File "/opt/conda/lib/python3.8/site-packages/torch/nn/functional.py", line 1383, in gelu
+    return torch._C._nn.gelu(input)
+RuntimeError: CUDA out of memory. Tried to allocate 270.00 MiB (GPU 0; 31.75 GiB total capacity; 30.23 GiB already allocated; 11.50 MiB free; 30.61 GiB reserved in total by PyTorch)

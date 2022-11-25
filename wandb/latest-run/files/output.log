@@ -1,0 +1,167 @@
+
+사용할 수 있는 GPU는 1개 입니다.
+/opt/conda/lib/python3.8/site-packages/sklearn/model_selection/_split.py:666: UserWarning: The least populated class in y has only 1 members, which is less than n_splits=5.
+  warnings.warn(("The least populated class in y has only %d"
+==================================================
+현재 적용되고 있는 데이터 클래스는 EntityTokensDataset입니다.
+==================================================
+==================================================
+현재 적용되고 있는 모델 클래스는 EntityTokensModel입니다.
+==================================================
+Some weights of the model checkpoint at klue/roberta-large were not used when initializing RobertaModel: ['lm_head.bias', 'lm_head.layer_norm.weight', 'lm_head.dense.bias', 'lm_head.layer_norm.bias', 'lm_head.decoder.weight', 'lm_head.decoder.bias', 'lm_head.dense.weight']
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at klue/roberta-large and are newly initialized: ['roberta.pooler.dense.bias', 'roberta.pooler.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+  0%|                                                                                                                    | 0/3 [00:00<?, ?it/s]/opt/conda/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2198: FutureWarning: The `pad_to_max_length` argument is deprecated and will be removed in a future version, use `padding=True` or `padding='longest'` to pad to the longest sequence in the batch, or use `padding='max_length'` to pad to a max length. In this case, you can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to pad to the maximal input size of the model (e.g. 512 for Bert).
+  warnings.warn(
+==================================================
+현재 적용되고 있는 트레이너는 EntityTokensTrainer입니다.
+==================================================
+torch.Size([32])
+100%|████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:02<00:00,  1.26it/s, loss=3.31, lr=5e-5]
+  0%|                                                                                                                    | 0/1 [00:00<?, ?it/s]
+torch.Size([32, 30])
+torch.Size([32, 30])
+torch.Size([32])
+torch.Size([32])
+torch.Size([32, 30])
+torch.Size([32, 30])
+torch.Size([32])
+torch.Size([16])
+torch.Size([16, 30])
+torch.Size([16, 30])
+torch.Size([16])
+torch.Size([20, 30])
+Epoch [1/10] Val_loss : 2.982421875
+Epoch [1/10] klue_re_micro_f1 : 0.0
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  4.59it/s]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+  0%|                                                                                                                    | 0/3 [00:00<?, ?it/s]/opt/conda/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2198: FutureWarning: The `pad_to_max_length` argument is deprecated and will be removed in a future version, use `padding=True` or `padding='longest'` to pad to the longest sequence in the batch, or use `padding='max_length'` to pad to a max length. In this case, you can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to pad to the maximal input size of the model (e.g. 512 for Bert).
+  warnings.warn(
+ 67%|██████████████████████████████████████████████████████████▋                             | 2/3 [00:01<00:00,  1.39it/s, loss=2.78, lr=5e-5]
+torch.Size([32])
+torch.Size([32, 30])
+torch.Size([32, 30])
+torch.Size([32])
+torch.Size([32])
+torch.Size([32, 30])
+torch.Size([32, 30])
+torch.Size([32])
+torch.Size([16])
+torch.Size([16, 30])
+torch.Size([16, 30])
+torch.Size([16])
+torch.Size([20, 30])
+Epoch [2/10] Val_loss : 2.646484375
+Epoch [2/10] klue_re_micro_f1 : 0.0
+100%|████████████████████████████████████████████████████████████████████████████████████████| 3/3 [00:01<00:00,  1.61it/s, loss=2.69, lr=5e-5]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:00<00:00,  4.66it/s]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+/opt/conda/lib/python3.8/site-packages/sklearn/metrics/_ranking.py:817: RuntimeWarning: invalid value encountered in true_divide
+  recall = tps / tps[-1]
+  0%|                                                                                                                    | 0/3 [00:00<?, ?it/s]/opt/conda/lib/python3.8/site-packages/transformers/tokenization_utils_base.py:2198: FutureWarning: The `pad_to_max_length` argument is deprecated and will be removed in a future version, use `padding=True` or `padding='longest'` to pad to the longest sequence in the batch, or use `padding='max_length'` to pad to a max length. In this case, you can give a specific length with `max_length` (e.g. `max_length=45`) or leave max_length to None to pad to the maximal input size of the model (e.g. 512 for Bert).
+  warnings.warn(
+ 33%|█████████████████████████████▋                                                           | 1/3 [00:00<00:01,  1.31it/s, loss=2.2, lr=5e-5]
+Traceback (most recent call last):
+  File "train.py", line 104, in <module>
+    main(config_w)
+  File "train.py", line 86, in main
+    trainer.train()
+  File "/opt/ml/seonjongbaseline/trainer/EntityTokensTrainer.py", line 38, in train
+    self._train_epoch(epoch)
+  File "/opt/ml/seonjongbaseline/trainer/EntityTokensTrainer.py", line 51, in _train_epoch
+    for i, batch in enumerate(pbar):
+  File "/opt/conda/lib/python3.8/site-packages/tqdm/std.py", line 1171, in __iter__
+    for obj in iterable:
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 435, in __next__
+    data = self._next_data()
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 475, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/opt/conda/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 44, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/opt/ml/seonjongbaseline/dataloader/EntityTokensDataset.py", line 68, in __getitem__
+    entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
+  File "/opt/ml/seonjongbaseline/dataloader/EntityTokensDataset.py", line 92, in _entity_embedding
+    while sentence[i] != self.tokenizer.pad_token_id:
+  File "/opt/conda/lib/python3.8/site-packages/torch/tensor.py", line 27, in wrapped
+    return f(*args, **kwargs)
+KeyboardInterrupt
+torch.Size([32])
+torch.Size([32, 30])
+torch.Size([32, 30])
+torch.Size([32])
