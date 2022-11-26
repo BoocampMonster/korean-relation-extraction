@@ -1,1 +1,0 @@
-{"train_loss": 2.203125, "_timestamp": 1669388959.95518, "_runtime": 31.129714012145996, "_step": 12, "epoch": 1, "val_loss": 2.646484375, "val_klue_re_micro_f1": 0.0, "val_klue_re_auprc": NaN, "runtime(Min)": 0.03666507403055827, "_wandb": {"runtime": 30}}
