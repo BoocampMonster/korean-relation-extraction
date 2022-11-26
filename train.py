@@ -92,13 +92,13 @@ if __name__=='__main__':
     args, _ = parser.parse_known_args()
     ## ex) python3 train.py --config baseline
     
-    config_w = OmegaConf.load(f'./configs/roberta_large_entity_marker_punct_tokens.yaml')
+    # config_w = OmegaConf.load(f'./configs/roberta_large_entity_marker_punct_tokens.yaml')
     # wandb 설정을 해주지 않으면 오류가 납니다
-    # config_w = wandb_setting(entity="nlp6",
-    #                         project='Entity_Marker',
-    #                         group_name='roberta_large',
-    #                         experiment_name= args.config,
-    #                         arg_config= args.config)
+    config_w = wandb_setting(entity="nlp6",
+                            project='Entity_Marker',
+                            group_name='roberta_large',
+                            experiment_name= args.config,
+                            arg_config= args.config)
     # print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
 
     main(config_w)

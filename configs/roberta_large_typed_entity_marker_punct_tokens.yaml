@@ -19,7 +19,7 @@ model:
 train:
     seed: 42
     gpus: 1
-    batch_size: 64
+    batch_size: 32
     max_epoch: 5
     learning_rate: 5e-5
     logging_step: 1
