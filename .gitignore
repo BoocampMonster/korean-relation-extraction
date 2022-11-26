@@ -5,6 +5,6 @@
 __pycache__
 .vscode
 
-save/
+save/*
 data/
 wandb/
