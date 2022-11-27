@@ -63,12 +63,16 @@ class T5Model(nn.Module):
         return outputs
     
 class PLMRNNModel(nn.Module):
-    def __init__(self, model_name, num_labels, dropout_rate):
+    def __init__(self, model_name, num_labels, dropout_rate, add_token_num=None):
         super().__init__()
         self.dropout_rate = dropout_rate
         self.num_labels = num_labels
         self.model_name = model_name
         self.model = AutoModel.from_pretrained(model_name)
+
+        if add_token_num:
+            self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
+
         self.lstm = nn.LSTM(input_size=self.model.config.hidden_size,
                             hidden_size=self.model.config.hidden_size,
                             num_layers=3,
@@ -92,7 +96,8 @@ class PLMRNNModel(nn.Module):
             _, hidden = self.gru(outputs) 
         else:
             outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)['last_hidden_state']
-            _, (hidden, _) = self.lstm(outputs) 
+            # _, (hidden, _) = self.lstm(outputs) 
+            _, hidden = self.gru(outputs) 
         outputs = torch.cat([hidden[-1], hidden[-2]], dim=1)
         outputs= self.activation(outputs)
         logits = self.regressor(outputs)
