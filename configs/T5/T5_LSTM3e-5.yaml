@@ -4,7 +4,7 @@ data:
     
 model:
     model_name : KETI-AIR/ke-t5-base
-    data_class : T5Datasets
+    data_class : T5Dataset
     model_class : LastHiddenLSTMModel
     trainer: BaselineTrainer
     saved_dir: T5_LSTM3e-5
