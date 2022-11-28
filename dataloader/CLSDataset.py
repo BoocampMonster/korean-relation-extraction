@@ -23,7 +23,7 @@ class CLSDataset(torch.utils.data.Dataset):
         self.tokenizer = tokenizer
         self.entity_marker_mode = entity_marker_mode
         
-        if self.mode:
+        if self.mode == 'train':
             self.sentence_array, entity_hint, tokenizer, self.target_array = self._load_data(data, tokenizer)
         else:
             self.sentence_array, entity_hint, tokenizer = self._load_data(data, tokenizer)
@@ -40,7 +40,7 @@ class CLSDataset(torch.utils.data.Dataset):
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
         sentence, entity_hint, tokenizer = getattr(pre_marker, self.entity_marker_mode)(data, tokenizer)
-        if self.mode: # train or validation일 경우
+        if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
             
             return sentence, entity_hint, tokenizer, target
@@ -60,13 +60,13 @@ class CLSDataset(torch.utils.data.Dataset):
             sentence,
             add_special_tokens = True,      
             max_length = self.max_length,           
-            pad_to_max_length = True, # 여기서 이미 패딩을 수행합니다.
+            padding='max_length',
             truncation=True,
             return_attention_mask = True,   
             return_tensors = 'pt',
             )
 
-        if self.mode:              
+        if self.mode == 'train':              
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1')}

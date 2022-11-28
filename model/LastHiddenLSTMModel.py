@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import einops as ein
-from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer, T5ForConditionalGeneration
     
 class LastHiddenLSTMModel(nn.Module):
     """_summary_
@@ -12,20 +12,28 @@ class LastHiddenLSTMModel(nn.Module):
         super().__init__()
         self.dropout_rate = dropout_rate
         self.num_labels = num_labels
-        self.model = AutoModel.from_pretrained(model_name)
+        self.model_name = model_name
         
+        if add_token_num:
+            self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
+        
+        if 't5' in self.model_name:
+            self.model = T5ForConditionalGeneration.from_pretrained(self.model_name).get_encoder()
+        else:
+            self.model = AutoModel.from_pretrained(self.model_name)
+
         self.lstm = nn.LSTM(input_size=self.model.config.hidden_size,
                     hidden_size=self.model.config.hidden_size,
                     num_layers=3,
                     bidirectional=True,
                     batch_first=True)
-        
+
         self.gru = nn.GRU(input_size=self.model.config.hidden_size,
                           hidden_size=self.model.config.hidden_size,
                           num_layers=3,
                           batch_first=True,
                           bidirectional=True)
-        
+
         if add_token_num:
             self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
         self.regressor = nn.Sequential(
@@ -33,16 +41,14 @@ class LastHiddenLSTMModel(nn.Module):
             nn.Dropout(p=self.dropout_rate),
             nn.Linear(self.model.config.hidden_size * 2, self.num_labels)
         )
-        
-    @torch.cuda.amp.autocast()
+
     def forward(self, input_ids, attention_mask):
         last_hidden_state = self.model(input_ids=input_ids, attention_mask=attention_mask)['last_hidden_state']
-        _, (hidden, _) = self.lstm(last_hidden_state)
+        if 'LSTM' in  self.model_name:
+            _, (hidden, _) = self.lstm(last_hidden_state)
+        elif 'GRU' in self.model_name:
+            _, hidden = self.gru(last_hidden_state)
         output = torch.cat([hidden[-1], hidden[-2]], dim=1)
-        # idx = torch.arange(input_ids.size(0)).to(input_ids.device)
-        # subj_emb = outputs[idx, entity_embed1] 
-        # obj_emb = outputs[idx, entity_embed2]
-        # output = torch.cat((subj_emb, obj_emb), dim=-1)
         logits = self.regressor(output)
         
         return logits

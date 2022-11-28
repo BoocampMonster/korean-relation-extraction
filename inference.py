@@ -34,7 +34,7 @@ def main(config):
         data=data,
         tokenizer=tokenizer,
         entity_marker_mode= config.data.get('entity_marker_mode'),
-        max_length=config.train.max_length)  
+        max_length=config.train.max_length) 
     test_dataloader = DataLoader(test, batch_size=1, pin_memory=True, shuffle=False)
     
     # 모델 아키텍처를 불러옵니다.
@@ -57,7 +57,7 @@ def main(config):
                 output = model(batch["input_ids"].to(device),
                            batch["attention_mask"].to(device),
                            entity_mask1 = batch['entity_mask1'],
-                           entity_mask2 = batch['entitymaskd2'])
+                           entity_mask2 = batch['entity_mask2'])
             elif config.data.get('entity_marker_mode'):
                 output = model(batch["input_ids"].to(device),
                            batch["attention_mask"].to(device),
@@ -66,7 +66,7 @@ def main(config):
             else:
                 output = model(batch["input_ids"].to(device),
                         batch["attention_mask"].to(device))
-            output = ein.rearrange(output, '1 class -> class')
+            output = ein.rearrange(output, '1 label -> label')
 
             probs = F.softmax(output, dim=-1).detach().cpu().numpy()
             preds = np.argmax(probs, axis=-1).item()

@@ -22,7 +22,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         self.max_length = max_length
         self.entity_marker_mode = entity_marker_mode
         
-        if self.mode:
+        if self.mode == 'train':
             self.sentence_array, self.entity_hint, self.tokenizer, self.target_array = self._load_data(data, tokenizer)
         else:
             self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(data, tokenizer)
@@ -38,7 +38,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
         sentence, entity_hint, tokenizer = getattr(pre_marker, self.entity_marker_mode)(data, tokenizer)
-        if self.mode: # train or validation일 경우
+        if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
             
             return sentence, entity_hint, tokenizer, target
@@ -66,7 +66,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         
         entity_mask1, entity_mask2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
         
-        if self.mode:           
+        if self.mode == 'train':           
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1'),
@@ -86,43 +86,27 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         entity_embedding2 = []
         
         i = 0
-        outbreak = False
+        
         while sentence[i] != self.tokenizer.pad_token_id:
-            if sentence[i] == hint1[0]:
-                idx_tmp = i
-                for entity in hint1:
-                    if sentence[idx_tmp] != entity:
-                        outbreak = True
-                        entity_embedding1 = []
-                        break
-                    entity_embedding1.append(idx_tmp)
-                    idx_tmp += 1
-                if outbreak:
-                    outbreak = False
-                    i += 1
-                    continue
+            if sentence[i] == hint1[0] and not entity_embedding1: # 임베딩을 찾지 못한 경우만 실행
+                if torch.equal(sentence[i:i+len(hint1)], hint1): # hint1 길이만큼 슬라이싱한 뒤 같은지 비교
+                    entity_embedding1 = [x for x in range(i,i+len(hint1))]
+                    i += len(hint1) -1
 
-            elif sentence[i] == hint2[0]:
-                idx_tmp = i
-                for entity in hint2:
-                    if sentence[idx_tmp] != entity:
-                        entity_embedding2 = []
-                        break
-                    entity_embedding2.append(idx_tmp)
-                    idx_tmp += 1
-                if outbreak:
-                    outbreak = False
-                    i += 1
-                    continue
+            elif sentence[i] == hint2[0] and not entity_embedding2:
+                if torch.equal(sentence[i:i+len(hint2)], hint2):
+                    entity_embedding2 = [x for x in range(i,i+len(hint2))]
+                    i += len(hint2) -1
             i += 1
+            if entity_embedding1 and entity_embedding2:
+                break # 임베딩을 모두 찾은 경우 바로 종료
             
         # [0, 0, 0, 1, 1, 1, 0, 0, 0] 형태로 만들어줌
-        if self.mask_mode:
-            first = [0] * self.max_length
-            second = [0] * self.max_length
-            for i in entity_embedding1:
-                first[i] = 1
-            for i in entity_embedding2:
-                second[i] = 1
+        first = [0] * self.max_length
+        second = [0] * self.max_length
+        for i in entity_embedding1:
+            first[i] = 1
+        for i in entity_embedding2:
+            second[i] = 1
                 
         return torch.tensor(first, dtype=torch.long), torch.tensor(second, dtype=torch.long)

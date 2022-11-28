@@ -22,7 +22,7 @@ class BaselineDataset(torch.utils.data.Dataset):
         self.max_length = max_length
         self.tokenizer = tokenizer
         
-        if self.mode:
+        if self.mode == 'train':
             self.sentence_array, self.target_array = self._load_data(data)
         else:
             self.sentence_array = self._load_data(data)
@@ -39,7 +39,7 @@ class BaselineDataset(torch.utils.data.Dataset):
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
         sentence = self._baseline_tkn(data)
-        if self.mode: # train or validation일 경우
+        if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
             
             return sentence, target
@@ -65,14 +65,14 @@ class BaselineDataset(torch.utils.data.Dataset):
         encoded_dict = self.tokenizer.encode_plus(
             sentence,    
             add_special_tokens = True,      
-            max_length = self.max_length,           
-            pad_to_max_length = True, # 여기서 이미 패딩을 수행합니다.
+            max_length = self.max_length,
+            padding='max_length',
             truncation=True,
             return_attention_mask = True,   
             return_tensors = 'pt',
             )
         
-        if self.mode:
+        if self.mode == 'train':
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1')}
