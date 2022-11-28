@@ -8,3 +8,5 @@ dependencies:
   - pytorch::torchaudio
   - pytorch::pytorch-cuda=11.7
   - conda-forge::omegaconf
+  - conda-forge::einops
+  - conda-forge::wandb
