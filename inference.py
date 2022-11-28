@@ -34,7 +34,6 @@ def main(config):
         data=data,
         tokenizer=tokenizer,
         entity_marker_mode= config.data.get('entity_marker_mode'),
-        mask_mode=config.data.mask_mode,
         max_length=config.train.max_length)  
     test_dataloader = DataLoader(test, batch_size=1, pin_memory=True, shuffle=False)
     
@@ -45,7 +44,7 @@ def main(config):
         dropout_rate = config.model.dropout_rate,
         add_token_num = config.data.get('entity_marker_num')
         ).to(device)
-    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:1_model.pt')
+    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:4_model.pt')
     model.load_state_dict(checkpoint)
     
     model = model.to(device)
@@ -54,7 +53,19 @@ def main(config):
     all_probs = []
     with torch.no_grad():
         for batch in tqdm(test_dataloader):
-            output = model(batch["input_ids"].to(device), batch["attention_mask"].to(device))
+            if 'mask' in config.model.saved_dir:
+                output = model(batch["input_ids"].to(device),
+                           batch["attention_mask"].to(device),
+                           entity_mask1 = batch['entity_mask1'],
+                           entity_mask2 = batch['entitymaskd2'])
+            elif config.data.get('entity_marker_mode'):
+                output = model(batch["input_ids"].to(device),
+                           batch["attention_mask"].to(device),
+                           entity_embed1 = batch['entity_embed1'],
+                           entity_embed2 = batch['entity_embed2'])
+            else:
+                output = model(batch["input_ids"].to(device),
+                        batch["attention_mask"].to(device))
             output = ein.rearrange(output, '1 class -> class')
 
             probs = F.softmax(output, dim=-1).detach().cpu().numpy()
@@ -80,7 +91,7 @@ if __name__=='__main__':
     parser.add_argument('--config', type=str, default='')
     args, _ = parser.parse_known_args()
     
-    file = 'baseline_typed_entity_marker_cls'
+    file = 'koelectra_entity_marker_punct_tokens'
     config_w = OmegaConf.load(f'./configs/{file}.yaml')
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
     

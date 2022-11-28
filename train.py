@@ -17,7 +17,6 @@ import utils.loss as Criterion
 import utils.metric as Metric
 from utils.wandb_setting import wandb_setting
 from utils.seed_setting import seed_setting
-from dataloader.EntityTokensDataset import EntityTokensDataset
 
 def main(config):
     seed_setting(config.train.seed)
@@ -96,8 +95,8 @@ if __name__=='__main__':
     # wandb 설정을 해주지 않으면 오류가 납니다
     config_w = wandb_setting(entity="nlp6",
                             project='Entity_Marker',
-                            group_name='roberta_large',
-                            experiment_name= args.config,
+                            group_name='LSTM(3)',
+                            experiment_name= args.config.split('/')[0],
                             arg_config= args.config)
     # print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
 
