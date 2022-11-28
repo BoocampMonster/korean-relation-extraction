@@ -34,9 +34,8 @@ def main(config):
         data=data,
         tokenizer=tokenizer,
         entity_marker_mode= config.data.get('entity_marker_mode'),
-        mask_mode=config.data.mask_mode,
         max_length=config.train.max_length)  
-    test_dataloader = DataLoader(test, batch_size=1, pin_memory=True, shuffle=False)
+    test_dataloader = DataLoader(test, batch_size=16, pin_memory=True, shuffle=False)
     
     # 모델 아키텍처를 불러옵니다.
     model = getattr(Model, config.model.model_class)(
@@ -45,7 +44,7 @@ def main(config):
         dropout_rate = config.model.dropout_rate,
         add_token_num = config.data.get('entity_marker_num')
         ).to(device)
-    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:1_model.pt')
+    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:3_model.pt')
     model.load_state_dict(checkpoint)
     
     model = model.to(device)
@@ -55,20 +54,21 @@ def main(config):
     with torch.no_grad():
         for batch in tqdm(test_dataloader):
             output = model(batch["input_ids"].to(device), batch["attention_mask"].to(device))
-            output = ein.rearrange(output, '1 class -> class')
+            # output = ein.rearrange(output, 'batch 1 class -> batch class')
 
             probs = F.softmax(output, dim=-1).detach().cpu().numpy()
-            preds = np.argmax(probs, axis=-1).item()
+            preds = np.argmax(probs, axis=-1)
             
             all_preds.append(preds)
             all_probs.append(probs.tolist())
-    
+        predictions = np.concatenate(all_preds).tolist()
+        probablity = np.concatenate(all_probs, axis=0).tolist()
     ## make csv file with predicted answer
     #########################################################
     # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
     output_df = pd.DataFrame(data['id'])
-    output_df['pred_label'] = all_preds
-    output_df['probs'] = all_probs
+    output_df['pred_label'] = predictions
+    output_df['probs'] = probablity
     output_df['pred_label'] = output_df['pred_label'].apply(lambda x: dict_num_to_label[x])
 
     output_df.to_csv(f'save/{config.model.saved_dir}/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
