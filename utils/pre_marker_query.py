@@ -53,7 +53,8 @@ def entity_mask(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, Callable]
         second_idx_e += len(wrapper_f) + len(first_word) + len(wrapper_b) - (first_idx_e + 1 - first_idx_s)
 
         sentence = sentence[:second_idx_s] + wrapper_f + second_word + wrapper_b + sentence[second_idx_e+1:]
-        sentences_list.append([sentence, subject_dict['type'], object_dict['type']])
+        # sentences_list = [문장, subject type, object type, subject word, object word]
+        sentences_list.append([sentence, subject_dict['type'], object_dict['type'], subject_dict['word'], object_dict['word']])
 
     return np.array(sentences_list), entity_embedding_hint, tokenizer
 
@@ -115,7 +116,8 @@ def entity_marker(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, Callabl
         second_idx_e += len(wrapper_f) + len(second_word) + len(wrapper_b)
 
         sentence = sentence[:second_idx_e+1] + wrapper_f + '/' + second_word + wrapper_b + sentence[second_idx_e+1:]
-        sentences_list.append([sentence, subject_dict['type'], object_dict['type']])
+        # sentences_list = [문장, subject type, object type, subject word, object word]
+        sentences_list.append([sentence, subject_dict['type'], object_dict['type'], subject_dict['word'], object_dict['word']])
 
     return np.array(sentences_list), entity_embedding_hint, tokenizer
 
@@ -179,7 +181,8 @@ def typed_entity_marker(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, C
         second_idx_e += len(wrapper_f) + len(second_word) + len(wrapper_b)
 
         sentence = sentence[:second_idx_e+1] + wrapper_f + '/' + second_word + wrapper_b + sentence[second_idx_e+1:]
-        sentences_list.append([sentence, subject_dict['type'], object_dict['type']])
+        # sentences_list = [문장, subject type, object type, subject word, object word]
+        sentences_list.append([sentence, subject_dict['type'], object_dict['type'], subject_dict['word'], object_dict['word']])
 
     return np.array(sentences_list), entity_embedding_hint, tokenizer
 
@@ -223,7 +226,8 @@ def entity_marker_punct(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, C
         second_idx_e += len(second_word)
 
         sentence = sentence[:second_idx_e+1] + second_word + sentence[second_idx_e+1:]
-        sentences_list.append([sentence, subject_dict['type'], object_dict['type']])
+        # sentences_list = [문장, subject type, object type, subject word, object word]    
+        sentences_list.append([sentence, subject_dict['type'], object_dict['type'], subject_dict['word'], object_dict['word']])
     
     return np.array(sentences_list), entity_embedding_hint, tokenizer
 
@@ -265,7 +269,7 @@ def typed_entity_marker_punct(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, l
         second_idx_e += 2 * len(first_punc) + len(first_word)
 
         sentence = sentence[:second_idx_s] + second_punc + second_word + sentence[second_idx_s:second_idx_e+1] + second_punc + sentence[second_idx_e+1:]
-
-        sentences_list.append([sentence, subject_dict['type'], object_dict['type']])
+        # sentences_list = [문장, subject type, object type, subject word, object word]
+        sentences_list.append([sentence, subject_dict['type'], object_dict['type'], subject_dict['word'], object_dict['word']])
 
     return np.array(sentences_list), entity_embedding_hint, tokenizer

@@ -38,13 +38,15 @@ def main(config):
         data=data.iloc[train_index,:],
         tokenizer=tokenizer,
         max_length=config.train.max_length,
-        entity_marker_mode= config.data.get('entity_marker_mode'))
+        entity_marker_mode= config.data.get('entity_marker_mode'),
+        query = config.data.get('query'))
     valid = getattr(DataModule, config.model.data_class)(
         mode = "train",
         data=data.iloc[val_index,:],
         tokenizer=tokenizer,
         entity_marker_mode= config.data.get('entity_marker_mode'),
-        max_length=config.train.max_length)
+        max_length=config.train.max_length,
+        query = config.data.get('query'))
 
     train_dataloader = DataLoader(train, batch_size= config.train.batch_size, pin_memory=True, shuffle=True)
     valid_dataloader = DataLoader(valid, batch_size= config.train.batch_size, pin_memory=True, shuffle=False)
@@ -92,12 +94,12 @@ if __name__=='__main__':
     args, _ = parser.parse_known_args()
     ## ex) python3 train.py --config baseline
     
-    config_w = OmegaConf.load(f'./configs/roberta_large_entity_marker_punct_tokens.yaml')
+    # config_w = OmegaConf.load(f'./configs/roberta_large_entity_marker_punct_tokens.yaml')
     # wandb 설정을 해주지 않으면 오류가 납니다
     config_w = wandb_setting(entity="nlp6",
-                            project='test-project',
-                            group_name='test',
-                            experiment_name= args.config,
+                            project='Query',
+                            group_name='entity_marker',
+                            experiment_name= args.config.split('/')[1],
                             arg_config= args.config)
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
 

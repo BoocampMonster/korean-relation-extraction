@@ -16,11 +16,13 @@ class QueryDataset(torch.utils.data.Dataset):
                  tokenizer: Callable,
                  entity_marker_mode:str=None,
                  max_length: int = 270, # 토크나이징할 문장의 최대 길이를 설정해줍니다.
+                 query: str = None
                  ):
         super().__init__()
         self.mode = mode
         self.max_length = max_length
         self.entity_marker_mode = entity_marker_mode
+        self.query = query
         
         if self.mode:
             self.sentence_array, self.entity_hint, self.tokenizer, self.target_array = self._load_data(data, tokenizer)
@@ -53,9 +55,9 @@ class QueryDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         # 토크나이저 및 전처리를 위해 두 문장을 하나로 합쳐줍니다.
         sentence = self.sentence_array[idx]
-        question = f'다음 {sentence[1]}와 {sentence[2]}의 관계는 :'
+        # sentence[1]:subject_entity,sentence[2]:object_entity,sentence[3]:subject_word,sentence[4]:object_word
         encoded_dict = self.tokenizer.encode_plus(
-            question,
+            self.query,
             sentence[0],    
             add_special_tokens = True,      
             max_length = self.max_length,           

@@ -22,7 +22,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         self.max_length = max_length
         self.entity_marker_mode = entity_marker_mode
         
-        if self.mode:
+        if self.mode == 'train':
             self.sentence_array, self.entity_hint, self.tokenizer, self.target_array = self._load_data(data, tokenizer)
         else:
             self.sentence_array, self.entity_hint, self.tokenizer = self._load_data(data, tokenizer)
@@ -38,7 +38,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
         sentence, entity_hint, tokenizer = getattr(pre_marker, self.entity_marker_mode)(data, tokenizer)
-        if self.mode: # train or validation일 경우
+        if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
             
             return sentence, entity_hint, tokenizer, target
@@ -66,7 +66,7 @@ class EntityMaskDataset(torch.utils.data.Dataset):
         
         entity_mask1, entity_mask2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
         
-        if self.mode:           
+        if self.mode == 'train':           
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1'),
