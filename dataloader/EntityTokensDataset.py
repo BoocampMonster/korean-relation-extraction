@@ -82,41 +82,23 @@ class EntityTokensDataset(torch.utils.data.Dataset):
     def _entity_embedding(self, entity_hint:tuple, sentence:torch.tensor) ->  Tuple[torch.tensor, torch.tensor]:
         hint1 = self.tokenizer.encode(entity_hint[0], return_tensors='pt', add_special_tokens=False)[0]
         hint2 = self.tokenizer.encode(entity_hint[1], return_tensors='pt', add_special_tokens=False)[0]
-
         entity_embedding1 = []
         entity_embedding2 = []
 
         i = 0
-        outbreak = False
-        while sentence[i] != self.tokenizer.pad_token_id:
-            if sentence[i] == hint1[0]:
-                idx_tmp = i
-                for entity in hint1:
-                    if sentence[idx_tmp] != entity:
-                        outbreak = True
-                        entity_embedding1 = []
-                        break
-                    entity_embedding1.append(idx_tmp)
-                    idx_tmp += 1
-                if outbreak:
-                    outbreak = False
-                    i += 1
-                    continue
-                i += (len(hint1)-1)
 
-            elif sentence[i] == hint2[0]:
-                idx_tmp = i
-                for entity in hint2:
-                    if sentence[idx_tmp] != entity:
-                        entity_embedding2 = []
-                        break
-                    entity_embedding2.append(idx_tmp)
-                    idx_tmp += 1
-                if outbreak:
-                    outbreak = False
-                    i += 1
-                    continue
-                i += (len(hint2)-1)
+        while sentence[i] != self.tokenizer.pad_token_id:
+            if sentence[i] == hint1[0] and not entity_embedding1: # 임베딩을 찾지 못한 경우만 실행
+                if torch.equal(sentence[i:i+len(hint1)], hint1): # hint1 길이만큼 슬라이싱한 뒤 같은지 비교
+                    entity_embedding1 = [x for x in range(i,i+len(hint1))]
+                    i += len(hint1) -1
+
+            elif sentence[i] == hint2[0] and not entity_embedding2:
+                if torch.equal(sentence[i:i+len(hint2)], hint2):
+                    entity_embedding2 = [x for x in range(i,i+len(hint2))]
+                    i += len(hint2) -1
             i += 1
+            if entity_embedding1 and entity_embedding2:
+                break # 임베딩을 모두 찾은 경우 바로 종료
             
         return torch.tensor(entity_embedding1[0], dtype=torch.long), torch.tensor(entity_embedding2[0], dtype=torch.long)
