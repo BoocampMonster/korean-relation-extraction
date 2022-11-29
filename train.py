@@ -93,9 +93,9 @@ if __name__=='__main__':
     # config_w = OmegaConf.load(f'./configs/{args.config}.yaml')
     # wandb 설정을 해주지 않으면 오류가 납니다
     config_w = wandb_setting(entity="nlp6",
-                            project='Entity_Marker',
-                            group_name='LSTM(3)',
-                            experiment_name= args.config.split('/')[1],
+                            project='T5',
+                            group_name='T5',
+                            experiment_name= args.config.split('/')[-1],
                             arg_config= args.config)
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
 

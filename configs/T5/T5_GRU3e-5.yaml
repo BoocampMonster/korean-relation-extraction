@@ -4,8 +4,8 @@ data:
     
 model:
     model_name : KETI-AIR/ke-t5-base
-    data_class : T5Datasets
-    model_class : LastHiddenLSTMModel
+    data_class : T5Dataset
+    model_class : LastHiddenGRUModel
     trainer: BaselineTrainer
     saved_dir: T5_GRU3e-5
     loss : CEloss

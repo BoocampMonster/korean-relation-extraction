@@ -11,13 +11,15 @@ class BaselineModel(nn.Module):
         super().__init__()
         self.dropout_rate = dropout_rate
         self.num_labels = num_labels
+        self.model_name = model_name
         
         if 't5' in self.model_name:
             self.model = T5ForConditionalGeneration.from_pretrained(self.model_name).get_encoder()
         else:
             self.model = AutoModel.from_pretrained(self.model_name)
+            
         if add_token_num:
-            self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
+            self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(self.model_name).vocab_size + add_token_num)
         self.regressor = nn.Sequential(
             nn.Dropout(p=self.dropout_rate),
             nn.Linear(self.model.config.hidden_size, self.num_labels)

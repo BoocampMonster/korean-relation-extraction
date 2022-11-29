@@ -17,6 +17,7 @@ class EntityTokensModel(nn.Module):
         
         if add_token_num:
             self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
+            
         self.regressor = nn.Sequential(
             nn.Linear(2 * self.hidden_size, self.hidden_size),
             nn.ReLU(),
