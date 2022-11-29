@@ -88,11 +88,11 @@ def main(config):
 if __name__=='__main__':
     torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='')
+    parser.add_argument('--config', type=str, default='roberta_large/roberta_large_typed_entity_marker_punct_tokens')
     args, _ = parser.parse_known_args()
     
-    file = 'koelectra_entity_marker_punct_tokens'
-    config_w = OmegaConf.load(f'./configs/{file}.yaml')
+    config = OmegaConf.load(f'./configs/{args.config}.yaml')
+    
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
     
-    main(config_w)
+    main(config)
