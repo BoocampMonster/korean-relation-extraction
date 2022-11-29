@@ -15,17 +15,20 @@ import model as Model
 import torch.optim as optim
 import utils.loss as Criterion
 import utils.metric as Metric
-from utils.wandb_setting import wandb_setting
+import wandb
 from utils.seed_setting import seed_setting
 
-def main(config):
+config = None
+
+def main():
+    print(config)
     seed_setting(config.train.seed)
     tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)  
     data = pd.read_csv(config.data.train_path)
     with open('data/dict_label_to_num.pkl', 'rb') as f:
         dict_label_to_num = pickle.load(f)
     data['label'] = data['label'].apply(lambda x: dict_label_to_num[x])
-    skf = StratifiedKFold(n_splits=5) # train : valid = 0.8 : 0.2
+    skf = StratifiedKFold(n_splits=config.data.n_splits) # train : valid = 0.8 : 0.2
     train_index, val_index = next(iter(skf.split(data, data['label'])))
     
     # 데이터셋 로드 클래스를 불러옵니다.
@@ -83,20 +86,45 @@ def main(config):
     
     trainer.train()
 
+def wandb_sweep():
+    with wandb.init() as run:
+        # update any values not set by sweep
+        # run.config.setdefaults(config)
+        for k, v in run.config.items():
+            OmegaConf.update(config, k, v)
+        main()
+
 if __name__=='__main__':
     torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='')
+    parser.add_argument('--config', type=str, default='roberta_large/roberta_large_typed_entity_marker_punct_tokens')
+    parser.add_argument('--wandb', type=str, default='init')
     args, _ = parser.parse_known_args()
     ## ex) python3 train.py --config baseline
     
-    # config_w = OmegaConf.load(f'./configs/{args.config}.yaml')
+    config = OmegaConf.load(f'./configs/{args.config}.yaml')
+    
     # wandb 설정을 해주지 않으면 오류가 납니다
-    config_w = wandb_setting(entity="nlp6",
-                            project='T5',
-                            group_name='T5',
-                            experiment_name= args.config.split('/')[-1],
-                            arg_config= args.config)
+    wandb_config = OmegaConf.load(f'./configs/train/wandb_{args.wandb}.yaml')
+    
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
-
-    main(config_w)
+    
+    wandb.login()
+    
+    if wandb_config.get('sweep'):
+        sweep_config = OmegaConf.to_object(wandb_config.sweep)
+        sweep_id = wandb.sweep(
+                sweep=sweep_config,
+                entity=wandb_config.entity,
+                project=wandb_config.project)
+        wandb.agent(sweep_id=sweep_id, function=wandb_sweep, count=wandb_config.count)
+        
+    else:
+        wandb.init(
+                entity=wandb_config.entity,
+                project=wandb_config.project,
+                group=wandb_config.group,
+                name=wandb_config.experiment)
+        # wandb.config = config
+        main()
+    
