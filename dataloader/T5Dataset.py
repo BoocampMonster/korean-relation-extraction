@@ -38,7 +38,7 @@ class T5Dataset(torch.utils.data.Dataset):
             target(Optional[float])
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
-        sentence, entity_hint, tokenizer = getattr(pre_marker, 'entity_marker_punct')(data, tokenizer)
+        sentence, entity_hint, tokenizer = self.entity_marker_punct(data, tokenizer)
             
         if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
@@ -68,7 +68,7 @@ class T5Dataset(torch.utils.data.Dataset):
 
         entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
 
-        if self.mode == 'train':              
+        if self.mode == 'train':
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1'),
@@ -76,30 +76,29 @@ class T5Dataset(torch.utils.data.Dataset):
                     'entity_embed2' : entity_embed2}
         else:
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
-                    'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
+                    'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'),
                     'entity_embed1' : entity_embed1,
-                    'entity_embed2' : entity_embed2
-                    }
+                    'entity_embed2' : entity_embed2}
 
-    def entity_marker_punct(df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, Callable]:
+    def entity_marker_punct(self, df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, Callable]:
         sentences_list = []
         entity_embedding_hint = []
         for _, row in df.iterrows():
             subject_dict = literal_eval(row['subject_entity'])
             object_dict = literal_eval(row['object_entity'])
-            sentence = row['sentence']
+            sentence = 'klue_re text: ' + row['sentence']
             if subject_dict['start_idx'] <= object_dict['start_idx']: # 만약 subject가 앞에 있을 경우
-                first_idx_s = subject_dict['start_idx']
-                first_idx_e = subject_dict['end_idx']
-                second_idx_s = object_dict['start_idx']
-                second_idx_e = object_dict['end_idx']
+                first_idx_s = len('klue_re text: ') + subject_dict['start_idx']
+                first_idx_e = len('klue_re text: ') + subject_dict['end_idx']
+                second_idx_s = len('klue_re text: ') + object_dict['start_idx']
+                second_idx_e = len('klue_re text: ') + object_dict['end_idx']
                 first_word =  '*'
                 second_word = '#'
             else:
-                first_idx_s = object_dict['start_idx']
-                first_idx_e = object_dict['end_idx']
-                second_idx_s = subject_dict['start_idx']
-                second_idx_e = subject_dict['end_idx']
+                first_idx_s = len('klue_re text: ') + object_dict['start_idx']
+                first_idx_e = len('klue_re text: ') + object_dict['end_idx']
+                second_idx_s = len('klue_re text: ') + subject_dict['start_idx']
+                second_idx_e = len('klue_re text: ') + subject_dict['end_idx']
                 first_word = '#'
                 second_word = '*'
 
@@ -107,22 +106,40 @@ class T5Dataset(torch.utils.data.Dataset):
                 first_word + sentence[first_idx_s:first_idx_e+1] + first_word,
                 second_word + sentence[second_idx_s:second_idx_e+1] + second_word
             ))
+            if sentence[first_idx_s-1] == ' ':
+                sentence = sentence[:first_idx_s] + first_word + sentence[first_idx_s:]
+                first_idx_e += len(first_word)
+                second_idx_s += len(first_word)
+                second_idx_e += len(first_word)
+            elif sentence[first_idx_s-1] != ' ':
+                sentence = sentence[:first_idx_s] + ' ' + first_word + sentence[first_idx_s:]
+                first_idx_e += len(first_word) + 1
+                second_idx_s += len(first_word) + 1
+                second_idx_e += len(first_word) + 1
+                
+            if sentence[first_idx_e+1] == ' ':
+                sentence = sentence[:first_idx_e+1] + first_word + sentence[first_idx_e+1:]
+                second_idx_s += len(first_word)
+                second_idx_e += len(first_word)
+            elif sentence[first_idx_e+1] != ' ':
+                sentence = sentence[:first_idx_e+1] + first_word + ' ' + sentence[first_idx_e+1:]
+                second_idx_s += len(first_word) + 1
+                second_idx_e += len(first_word) + 1
+                
+            if sentence[second_idx_s-1] == ' ':
+                sentence = sentence[:second_idx_s] + second_word + sentence[second_idx_s:]
+                second_idx_e += len(second_word)
+            elif sentence[second_idx_s-1] != ' ':
+                sentence = sentence[:second_idx_s] + ' ' + second_word + sentence[second_idx_s:]
+                second_idx_e += len(second_word) + 1
 
-            sentence = sentence[:first_idx_s] + first_word + sentence[first_idx_s:]
-            first_idx_e += len(first_word)
-            second_idx_s += len(first_word)
-            second_idx_e += len(first_word)
+            if sentence[second_idx_e+1] == ' ':
+                sentence = sentence[:second_idx_e+1] + second_word + sentence[second_idx_e+1:]
+            elif sentence[second_idx_e+1] != ' ':
+                sentence = sentence[:second_idx_e+1] + second_word + ' ' + sentence[second_idx_e+1:]
 
-            sentence = sentence[:first_idx_e+1] + first_word + sentence[first_idx_e+1:]
-            second_idx_s += len(first_word)
-            second_idx_e += len(first_word)
-
-            sentence = sentence[:second_idx_s] + second_word + sentence[second_idx_s:]
-            second_idx_e += len(second_word)
-
-            sentence = 'klue_re text: ' + sentence[:second_idx_e+1] + second_word + sentence[second_idx_e+1:]
             sentences_list.append(sentence)
-        
+
         return np.array(sentences_list), entity_embedding_hint, tokenizer
     
     def _entity_embedding(self, entity_hint:tuple, sentence:torch.tensor) ->  Tuple[torch.tensor, torch.tensor]:
@@ -146,5 +163,5 @@ class T5Dataset(torch.utils.data.Dataset):
             i += 1
             if entity_embedding1 and entity_embedding2:
                 break # 임베딩을 모두 찾은 경우 바로 종료
-            
+
         return torch.tensor(entity_embedding1[0], dtype=torch.long), torch.tensor(entity_embedding2[0], dtype=torch.long)

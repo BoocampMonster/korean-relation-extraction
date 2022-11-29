@@ -13,8 +13,10 @@ class EntityMaskModel(nn.Module):
         self.num_labels = num_labels
         
         self.model = AutoModel.from_pretrained(model_name)
+        
         if add_token_num:
             self.model.resize_token_embeddings(AutoTokenizer.from_pretrained(model_name).vocab_size + add_token_num)
+            
         self.regressor = nn.Sequential(
             nn.Linear(2 * self.model.config.hidden_size, self.model.config.hidden_size), # [batch, 1, hidden_size] -> [batch, hidden_size]
             nn.ReLU(),

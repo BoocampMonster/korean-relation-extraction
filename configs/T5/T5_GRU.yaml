@@ -5,7 +5,7 @@ data:
 model:
     model_name : KETI-AIR/ke-t5-base
     data_class : T5Dataset
-    model_class : LastHiddenLSTMModel
+    model_class : LastHiddenGRUModel
     trainer: BaselineTrainer
     saved_dir: T5_GRU
     loss : CEloss
@@ -20,6 +20,6 @@ train:
     gpus: 1
     batch_size: 32
     max_epoch: 5
-    learning_rate: 1e-5
+    learning_rate: 5e-5
     logging_step: 1
     max_length : 300
