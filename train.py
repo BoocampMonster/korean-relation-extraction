@@ -15,7 +15,7 @@ import model as Model
 import torch.optim as optim
 import utils.loss as Criterion
 import utils.metric as Metric
-from utils.wandb_setting import wandb_setting
+import wandb
 from utils.seed_setting import seed_setting
 
 def main(config):
@@ -86,17 +86,25 @@ def main(config):
 if __name__=='__main__':
     torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='')
+    parser.add_argument('--config', type=str, default='roberta_large/roberta_large_typed_entity_marker_punct_tokens')
+    parser.add_argument('--wandb', type=str, default='init')
     args, _ = parser.parse_known_args()
     ## ex) python3 train.py --config baseline
     
-    # config_w = OmegaConf.load(f'./configs/{args.config}.yaml')
+    config = OmegaConf.load(f'./configs/{args.config}.yaml')
+    
     # wandb 설정을 해주지 않으면 오류가 납니다
-    config_w = wandb_setting(entity="nlp6",
-                            project='T5',
-                            group_name='T5',
-                            experiment_name= args.config.split('/')[-1],
-                            arg_config= args.config)
+    wandb_config = OmegaConf.load(f'./configs/train/wandb_{args.wandb}.yaml')
+    
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
-
-    main(config_w)
+    
+    wandb.login()
+    
+    wandb.init(
+            entity=wandb_config.entity,
+            project=wandb_config.project,
+            group=wandb_config.group,
+            name=wandb_config.experiment)
+    # wandb.config = config
+    main(config)
+    

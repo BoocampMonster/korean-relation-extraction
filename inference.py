@@ -13,7 +13,6 @@ from torch.utils.data.dataloader import DataLoader
 import dataloader as DataModule
 from transformers import AutoTokenizer
 import model as Model
-from utils.wandb_setting import wandb_setting
 from utils.seed_setting import seed_setting
 
 def main(config):
