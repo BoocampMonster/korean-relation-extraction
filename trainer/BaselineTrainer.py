@@ -7,7 +7,6 @@ import time
 import gc
 import einops as ein
 import torch.nn.functional as F
-from torch.cuda.amp import GradScaler, autocast
 
 class BaselineTrainer():
     """
@@ -45,22 +44,19 @@ class BaselineTrainer():
         self.model.train()
         epoch_loss = 0
         steps = 0
-        scaler = GradScaler()
         pbar = tqdm(self.train_dataloader)
         for i, batch in enumerate(pbar):
             self.optimizer.zero_grad()
             steps += 1
-            with autocast():
-                logits = self.model(input_ids = batch["input_ids"].to(self.device),
-                                    attention_mask = batch["attention_mask"].to(self.device))
-                label = ein.rearrange(batch["labels"], 'b 1 -> b').to(self.device)
-                loss = self.criterion(logits, label)    
+            logits = self.model(input_ids = batch["input_ids"].to(self.device),
+                                attention_mask = batch["attention_mask"].to(self.device))
+            label = ein.rearrange(batch["labels"], 'b 1 -> b').to(self.device)
+            loss = self.criterion(logits, label)
                 
-            scaler.scale(loss).backward()
+            loss.backward()
             epoch_loss += loss.detach().cpu().numpy().item()
             
-            scaler.step(self.optimizer)
-            scaler.update()
+            self.optimizer.step()
             
             pbar.set_postfix({
                 'loss' : epoch_loss / steps,
