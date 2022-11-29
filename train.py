@@ -25,7 +25,7 @@ def main(config):
     with open('data/dict_label_to_num.pkl', 'rb') as f:
         dict_label_to_num = pickle.load(f)
     data['label'] = data['label'].apply(lambda x: dict_label_to_num[x])
-    skf = StratifiedKFold(n_splits=5) # train : valid = 0.8 : 0.2
+    skf = StratifiedKFold(n_splits=config.data.n_splits) # train : valid = 0.8 : 0.2
     train_index, val_index = next(iter(skf.split(data, data['label'])))
     
     # 데이터셋 로드 클래스를 불러옵니다.
