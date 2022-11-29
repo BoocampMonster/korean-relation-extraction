@@ -25,7 +25,6 @@ class EntityTokensModel(nn.Module):
             nn.Linear(self.hidden_size, self.num_labels)
         )
         
-    @torch.cuda.amp.autocast()
     def forward(self, input_ids, attention_mask, entity_embed1, entity_embed2):
         last_hidden_state = self.model(input_ids=input_ids, attention_mask=attention_mask)['last_hidden_state']
         idx = torch.arange(input_ids.size(0)).to(input_ids.device)
