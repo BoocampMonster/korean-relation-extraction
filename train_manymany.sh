@@ -4,5 +4,5 @@ WANDB=("init" "init" "init" "init")
 
 for (( i=0; i<4; i++ ))
 do
-    python3 train.py --config ${CONFIGS[$i]}
+    python3 train.py --config ${CONFIGS[$i]} -- wandb ${WANDB[$i]}
 done
