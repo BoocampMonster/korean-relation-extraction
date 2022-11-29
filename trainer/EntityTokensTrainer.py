@@ -57,7 +57,7 @@ class EntityTokensTrainer():
                                 entity_embed2 = batch['entity_embed2'].to(self.device))
             label = ein.rearrange(batch["labels"], 'b 1 -> b').to(self.device)
             loss = self.criterion(logits, label)
-                
+
             loss.backward()
             epoch_loss += loss.detach().cpu().numpy().item()
             

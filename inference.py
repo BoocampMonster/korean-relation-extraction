@@ -34,8 +34,8 @@ def main(config):
         data=data,
         tokenizer=tokenizer,
         entity_marker_mode= config.data.get('entity_marker_mode'),
-        max_length=config.train.max_length)  
-    test_dataloader = DataLoader(test, batch_size=16, pin_memory=True, shuffle=False)
+        max_length=config.train.max_length) 
+    test_dataloader = DataLoader(test, batch_size=1, pin_memory=True, shuffle=False)
     
     # 모델 아키텍처를 불러옵니다.
     model = getattr(Model, config.model.model_class)(
@@ -44,7 +44,7 @@ def main(config):
         dropout_rate = config.model.dropout_rate,
         add_token_num = config.data.get('entity_marker_num')
         ).to(device)
-    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:3_model.pt')
+    checkpoint = torch.load(f'./save/{config.model.saved_dir}/epoch:4_model.pt')
     model.load_state_dict(checkpoint)
     
     model = model.to(device)
@@ -53,22 +53,33 @@ def main(config):
     all_probs = []
     with torch.no_grad():
         for batch in tqdm(test_dataloader):
-            output = model(batch["input_ids"].to(device), batch["attention_mask"].to(device))
-            # output = ein.rearrange(output, 'batch 1 class -> batch class')
+            if 'mask' in config.model.saved_dir:
+                output = model(batch["input_ids"].to(device),
+                           batch["attention_mask"].to(device),
+                           entity_mask1 = batch['entity_mask1'],
+                           entity_mask2 = batch['entity_mask2'])
+            elif config.data.get('entity_marker_mode'):
+                output = model(batch["input_ids"].to(device),
+                           batch["attention_mask"].to(device),
+                           entity_embed1 = batch['entity_embed1'],
+                           entity_embed2 = batch['entity_embed2'])
+            else:
+                output = model(batch["input_ids"].to(device),
+                        batch["attention_mask"].to(device))
+            output = ein.rearrange(output, '1 label -> label')
 
             probs = F.softmax(output, dim=-1).detach().cpu().numpy()
-            preds = np.argmax(probs, axis=-1)
+            preds = np.argmax(probs, axis=-1).item()
             
             all_preds.append(preds)
             all_probs.append(probs.tolist())
-        predictions = np.concatenate(all_preds).tolist()
-        probablity = np.concatenate(all_probs, axis=0).tolist()
+    
     ## make csv file with predicted answer
     #########################################################
     # 아래 directory와 columns의 형태는 지켜주시기 바랍니다.
     output_df = pd.DataFrame(data['id'])
-    output_df['pred_label'] = predictions
-    output_df['probs'] = probablity
+    output_df['pred_label'] = all_preds
+    output_df['probs'] = all_probs
     output_df['pred_label'] = output_df['pred_label'].apply(lambda x: dict_num_to_label[x])
 
     output_df.to_csv(f'save/{config.model.saved_dir}/submission.csv', index=False) # 최종적으로 완성된 예측한 라벨 csv 파일 형태로 저장.
@@ -77,10 +88,11 @@ def main(config):
 if __name__=='__main__':
     torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config', type=str, default='baseline_typed_entity_marker_cls')
+    parser.add_argument('--config', type=str, default='')
     args, _ = parser.parse_known_args()
     
-    config_w = OmegaConf.load(f'./configs/{args.config}.yaml')
+    file = 'koelectra_entity_marker_punct_tokens'
+    config_w = OmegaConf.load(f'./configs/{file}.yaml')
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
     
     main(config_w)

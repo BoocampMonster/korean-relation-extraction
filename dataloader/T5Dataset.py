@@ -3,9 +3,10 @@ import numpy as np
 from typing import Callable, Tuple
 import pandas as pd
 import einops as ein
+from ast import literal_eval
 from utils import pre_marker
 
-class EntityTokensDataset(torch.utils.data.Dataset):
+class T5Dataset(torch.utils.data.Dataset):
     """_summary_
     데이터를 불러와 전처리와 토크나이저 등 다양한 전처리를 수행하고
     data와 target을 나눠주는 작업을 해주는 클래스입니다.
@@ -37,7 +38,8 @@ class EntityTokensDataset(torch.utils.data.Dataset):
             target(Optional[float])
         """
         # root path 안의 mode에 해당하는 csv 파일을 가져옵니다.
-        sentence, entity_hint, tokenizer = getattr(pre_marker, self.entity_marker_mode)(data, tokenizer)
+        sentence, entity_hint, tokenizer = self.entity_marker_punct(data, tokenizer)
+            
         if self.mode == 'train': # train or validation일 경우
             target = data['label'].to_numpy()
             
@@ -58,14 +60,15 @@ class EntityTokensDataset(torch.utils.data.Dataset):
             sentence,    
             add_special_tokens = True,      
             max_length = self.max_length,           
-            pad_to_max_length = True, # 여기서 이미 패딩을 수행합니다.
+            padding='max_length',
             truncation=True,
             return_attention_mask = True,   
             return_tensors = 'pt',
             )
+
         entity_embed1, entity_embed2 = self._entity_embedding(self.entity_hint[idx], encoded_dict['input_ids'][0])
 
-        if self.mode == 'train':              
+        if self.mode == 'train':
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
                     'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
                     'labels': ein.rearrange(torch.tensor(self.target_array[idx], dtype=torch.long), ' -> 1'),
@@ -73,10 +76,71 @@ class EntityTokensDataset(torch.utils.data.Dataset):
                     'entity_embed2' : entity_embed2}
         else:
             return {'input_ids': ein.rearrange(encoded_dict.input_ids, '1 s -> s'),
-                    'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'), 
+                    'attention_mask': ein.rearrange(encoded_dict.attention_mask, '1 s -> s'),
                     'entity_embed1' : entity_embed1,
-                    'entity_embed2' : entity_embed2
-                    }
+                    'entity_embed2' : entity_embed2}
+
+    def entity_marker_punct(self, df:pd.DataFrame, tokenizer) -> Tuple[np.ndarray, list, Callable]:
+        sentences_list = []
+        entity_embedding_hint = []
+        for _, row in df.iterrows():
+            subject_dict = literal_eval(row['subject_entity'])
+            object_dict = literal_eval(row['object_entity'])
+            sentence = 'klue_re text: ' + row['sentence']
+            if subject_dict['start_idx'] <= object_dict['start_idx']: # 만약 subject가 앞에 있을 경우
+                first_idx_s = len('klue_re text: ') + subject_dict['start_idx']
+                first_idx_e = len('klue_re text: ') + subject_dict['end_idx']
+                second_idx_s = len('klue_re text: ') + object_dict['start_idx']
+                second_idx_e = len('klue_re text: ') + object_dict['end_idx']
+                first_word =  '*'
+                second_word = '#'
+            else:
+                first_idx_s = len('klue_re text: ') + object_dict['start_idx']
+                first_idx_e = len('klue_re text: ') + object_dict['end_idx']
+                second_idx_s = len('klue_re text: ') + subject_dict['start_idx']
+                second_idx_e = len('klue_re text: ') + subject_dict['end_idx']
+                first_word = '#'
+                second_word = '*'
+
+            entity_embedding_hint.append((
+                first_word + sentence[first_idx_s:first_idx_e+1] + first_word,
+                second_word + sentence[second_idx_s:second_idx_e+1] + second_word
+            ))
+            if sentence[first_idx_s-1] == ' ':
+                sentence = sentence[:first_idx_s] + first_word + sentence[first_idx_s:]
+                first_idx_e += len(first_word)
+                second_idx_s += len(first_word)
+                second_idx_e += len(first_word)
+            elif sentence[first_idx_s-1] != ' ':
+                sentence = sentence[:first_idx_s] + ' ' + first_word + sentence[first_idx_s:]
+                first_idx_e += len(first_word) + 1
+                second_idx_s += len(first_word) + 1
+                second_idx_e += len(first_word) + 1
+                
+            if sentence[first_idx_e+1] == ' ':
+                sentence = sentence[:first_idx_e+1] + first_word + sentence[first_idx_e+1:]
+                second_idx_s += len(first_word)
+                second_idx_e += len(first_word)
+            elif sentence[first_idx_e+1] != ' ':
+                sentence = sentence[:first_idx_e+1] + first_word + ' ' + sentence[first_idx_e+1:]
+                second_idx_s += len(first_word) + 1
+                second_idx_e += len(first_word) + 1
+                
+            if sentence[second_idx_s-1] == ' ':
+                sentence = sentence[:second_idx_s] + second_word + sentence[second_idx_s:]
+                second_idx_e += len(second_word)
+            elif sentence[second_idx_s-1] != ' ':
+                sentence = sentence[:second_idx_s] + ' ' + second_word + sentence[second_idx_s:]
+                second_idx_e += len(second_word) + 1
+
+            if sentence[second_idx_e+1] == ' ':
+                sentence = sentence[:second_idx_e+1] + second_word + sentence[second_idx_e+1:]
+            elif sentence[second_idx_e+1] != ' ':
+                sentence = sentence[:second_idx_e+1] + second_word + ' ' + sentence[second_idx_e+1:]
+
+            sentences_list.append(sentence)
+
+        return np.array(sentences_list), entity_embedding_hint, tokenizer
     
     def _entity_embedding(self, entity_hint:tuple, sentence:torch.tensor) ->  Tuple[torch.tensor, torch.tensor]:
         hint1 = self.tokenizer.encode(entity_hint[0], return_tensors='pt', add_special_tokens=False)[0]
@@ -99,5 +163,5 @@ class EntityTokensDataset(torch.utils.data.Dataset):
             i += 1
             if entity_embedding1 and entity_embedding2:
                 break # 임베딩을 모두 찾은 경우 바로 종료
-            
+
         return torch.tensor(entity_embedding1[0], dtype=torch.long), torch.tensor(entity_embedding2[0], dtype=torch.long)

@@ -17,12 +17,10 @@ import utils.loss as Criterion
 import utils.metric as Metric
 from utils.wandb_setting import wandb_setting
 from utils.seed_setting import seed_setting
-from dataloader.EntityTokensDataset import EntityTokensDataset
 
 def main(config):
     seed_setting(config.train.seed)
-    tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)
-    
+    tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)  
     data = pd.read_csv(config.data.train_path)
     with open('data/dict_label_to_num.pkl', 'rb') as f:
         dict_label_to_num = pickle.load(f)
@@ -92,12 +90,12 @@ if __name__=='__main__':
     args, _ = parser.parse_known_args()
     ## ex) python3 train.py --config baseline
     
-    config_w = OmegaConf.load(f'./configs/roberta_large_entity_marker_punct_tokens.yaml')
+    # config_w = OmegaConf.load(f'./configs/{args.config}.yaml')
     # wandb 설정을 해주지 않으면 오류가 납니다
     config_w = wandb_setting(entity="nlp6",
-                            project='test-project',
-                            group_name='test',
-                            experiment_name= args.config,
+                            project='T5',
+                            group_name='T5',
+                            experiment_name= args.config.split('/')[-1],
                             arg_config= args.config)
     print(f'사용할 수 있는 GPU는 {torch.cuda.device_count()}개 입니다.')
 
