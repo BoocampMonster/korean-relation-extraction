@@ -18,7 +18,10 @@ import utils.metric as Metric
 import wandb
 from utils.seed_setting import seed_setting
 
-def main(config):
+config = None
+
+def main():
+    print(config)
     seed_setting(config.train.seed)
     tokenizer = AutoTokenizer.from_pretrained(config.model.model_name)  
     data = pd.read_csv(config.data.train_path)
@@ -83,6 +86,14 @@ def main(config):
     
     trainer.train()
 
+def wandb_sweep():
+    with wandb.init() as run:
+        # update any values not set by sweep
+        # run.config.setdefaults(config)
+        for k, v in run.config.items():
+            OmegaConf.update(config, k, v)
+        main()
+
 if __name__=='__main__':
     torch.cuda.empty_cache()
     parser = argparse.ArgumentParser()
@@ -100,11 +111,20 @@ if __name__=='__main__':
     
     wandb.login()
     
-    wandb.init(
-            entity=wandb_config.entity,
-            project=wandb_config.project,
-            group=wandb_config.group,
-            name=wandb_config.experiment)
-    # wandb.config = config
-    main(config)
+    if wandb_config.get('sweep'):
+        sweep_config = OmegaConf.to_object(wandb_config.sweep)
+        sweep_id = wandb.sweep(
+                sweep=sweep_config,
+                entity=wandb_config.entity,
+                project=wandb_config.project)
+        wandb.agent(sweep_id=sweep_id, function=wandb_sweep, count=wandb_config.count)
+        
+    else:
+        wandb.init(
+                entity=wandb_config.entity,
+                project=wandb_config.project,
+                group=wandb_config.group,
+                name=wandb_config.experiment)
+        # wandb.config = config
+        main()
     
