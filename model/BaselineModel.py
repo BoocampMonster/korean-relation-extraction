@@ -45,7 +45,6 @@ class HiddenModel(nn.Module):
             nn.Linear(self.model.config.hidden_size, self.num_labels)
         )
         
-    @torch.cuda.amp.autocast()
     def forward(self, input_ids, attention_mask):
         last_hidden_state, pooler = self.model(input_ids=input_ids, attention_mask=attention_mask).to_tuple()
 

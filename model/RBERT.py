@@ -35,7 +35,6 @@ class RBERT(BertPreTrainedModel):
         avg_vector = sum_vector.float() / length_tensor.float()  # broadcasting
         return avg_vector
 
-    @torch.cuda.amp.autocast()
     def forward(self, input_ids, attention_mask, token_type_ids, labels, e1_mask, e2_mask):
         outputs = self.bert(
             input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids

@@ -4,6 +4,7 @@ from typing import Callable, Tuple
 import pandas as pd
 import einops as ein
 from utils import pre_marker_query
+from ast import literal_eval
 
 class QueryDataset(torch.utils.data.Dataset):
     """_summary_
@@ -57,7 +58,7 @@ class QueryDataset(torch.utils.data.Dataset):
         sentence = self.sentence_array[idx]
         # sentence[1]:subject_entity,sentence[2]:object_entity,sentence[3]:subject_word,sentence[4]:object_word
         encoded_dict = self.tokenizer.encode_plus(
-            self.query,
+            eval(self.query),
             sentence[0],    
             add_special_tokens = True,      
             max_length = self.max_length,           

@@ -3,7 +3,7 @@ data:
     test_path: data/test_data.csv
     entity_marker_mode: entity_marker
     entity_marker_num: 4
-    query: f'이 문장에서 {sentence[3]}와 {sentence[4]}의 관계를 고르시오'
+    query: f'{sentence[3]}와 {sentence[4]}의 관계를 고르시오'
     
 model:
     model_name : klue/roberta-large
@@ -23,6 +23,6 @@ train:
     gpus: 1
     batch_size: 16
     max_epoch: 5
-    learning_rate: 1e-5
+    learning_rate: 2e-5
     logging_step: 1
     max_length : 270

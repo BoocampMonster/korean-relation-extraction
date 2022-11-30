@@ -1,15 +1,16 @@
 data:
     train_path: data/train.csv
     test_path: data/test_data.csv
-    entity_marker_mode: entity_marker_punct
-    query: f'@{sentence[3]}@와 \#{sentence[4]}#의 관계를 고르시오.'
+    entity_marker_mode: typed_entity_marker
+    entity_marker_num: 18
+    query: f'이 문장에서 {sentence[4]}는 {sentence[3]}의 {sentence[2]}이다.'    
     
 model:
     model_name : klue/roberta-large
     data_class : QueryDataset
     model_class : PLMRNNModel
     trainer: BaselineTrainer
-    saved_dir: query_entity_marker_punct
+    saved_dir: query_typed_entity_marker
     loss : CEloss
     metric_list:
         metric1 : klue_re_micro_f1

@@ -5,7 +5,7 @@ import pandas as pd
 import einops as ein
 from utils import pre_marker_query
 
-class QueryDataset(torch.utils.data.Dataset):
+class ReversedQueryDataset(torch.utils.data.Dataset):
     """_summary_
     데이터를 불러와 전처리와 토크나이저 등 다양한 전처리를 수행하고
     data와 target을 나눠주는 작업을 해주는 클래스입니다.
@@ -58,7 +58,7 @@ class QueryDataset(torch.utils.data.Dataset):
         # sentence[1]:subject_entity,sentence[2]:object_entity,sentence[3]:subject_word,sentence[4]:object_word
         encoded_dict = self.tokenizer.encode_plus(
             sentence[0],
-            self.query,
+            eval(self.query),
             add_special_tokens = True,      
             max_length = self.max_length,           
             padding='max_length', # 여기서 이미 패딩을 수행합니다.

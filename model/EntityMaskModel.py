@@ -22,7 +22,6 @@ class EntityMaskModel(nn.Module):
             nn.Linear(self.model.config.hidden_size, self.num_labels)
         )
         
-    @torch.cuda.amp.autocast()
     def forward(self, input_ids, attention_mask, entity_mask1, entity_mask2):
         last_hidden_state, pooler = self.model(input_ids=input_ids, attention_mask=attention_mask).to_tuple()
         

@@ -1,7 +1,7 @@
 #!/bin/bash
-CONFIGS=("roberta_large_entity_marker_punct_tokens" "roberta_large_entity_marker_tokens" "roberta_large_entity_mask_tokens" "roberta_large_typed_entity_marker_punct_tokens" "roberta_large_typed_entity_marker_tokens")
+CONFIGS=("Query/Query_typed_entity_marker_sentence4" "Query/Query_typed_entity_marker_sentence5" "Query/Query_typed_entity_marker_sentence6")
 
-for (( i=0; i<5; i++ ))
+for (( i=0; i<3; i++ ))
 do
     python3 train.py --config ${CONFIGS[$i]}
 done
