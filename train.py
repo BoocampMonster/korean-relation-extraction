@@ -101,9 +101,11 @@ def main():
     trainer.train()
 
 def wandb_sweep():
+    wandb.config.update(config)
     with wandb.init() as run:
         # update any values not set by sweep
         # run.config.setdefaults(config)
+        run.config.update(config)
         for k, v in run.config.items():
             OmegaConf.update(config, k, v)
         main()
@@ -139,6 +141,6 @@ if __name__=='__main__':
                 project=wandb_config.project,
                 group=wandb_config.group,
                 name=wandb_config.experiment)
-        # wandb.config = config
+        wandb.config = config
         main()
     
