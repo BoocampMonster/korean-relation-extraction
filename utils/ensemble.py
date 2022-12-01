@@ -16,18 +16,24 @@ label = ['no_relation', 'org:top_members/employees', 'org:members',
        'per:place_of_birth', 'per:place_of_death', 'org:founded_by',
        'per:religion']
 
-def ensemble(path_to_csv_folder = "./ensemble", output = "output.csv"):
+def ensemble(path_to_csv_folder = "ensemble", output = "output.csv"):
     csv_names = []
     csv_dfs = []
     probs = []
     preds = []
     csv_probs = []
 
+    assert os.path.exists(path_to_csv_folder) != False, \
+        f"csv파일이 있는 폴더가 존재하지 않습니다. 참조한 폴더 위치 : {os.getcwd() + '/' + path_to_csv_folder}"
+
     for i in os.listdir(f"{path_to_csv_folder}"): # csv_dfs에 dataframe을 load
         if i.endswith(".csv"):
             csv_names.append(i.strip(".csv"))
             csv_dfs.append(pd.read_csv(path_to_csv_folder+"/"+i))
     
+    assert len(csv_names) != 0, \
+        "csv 파일이 존재하지 않습니다."
+
     for i in range(len(csv_dfs)):
         assert len(csv_dfs[i].columns) == 3, \
         f"csv 파일 중 submission_output이 아닌 파일이 존재합니다.\n파일명 : {csv_names[i]}, column 개수 : {len(csv_dfs[i].columns)}"
@@ -45,7 +51,16 @@ def ensemble(path_to_csv_folder = "./ensemble", output = "output.csv"):
     new_df['probs'] = probs
     new_df['pred_label'] = new_df['pred_label'].apply(lambda x: label[x])
     
-    new_df.to_csv(output)
+    yn = ""
+    if os.path.exists(output):
+        while yn == "":
+            yn = input(f"{output}파일이 존재합니다. 덮어쓰기[Y/N] : ")
+        if yn in ["Y", "y"]:
+            new_df.to_csv(output)
+        elif yn in ["N", "n"]:
+            pass
+    else:
+        new_df.to_csv(output)
 
     return new_df
 
@@ -54,6 +69,15 @@ def diff(ensembled, best_model):
     현재 폴더의 (ensembled, best_model) 두 파일명을 받아 변경된 라벨이 있는 경우 이를 출력합니다.
     결과값이 존재하는 경우, csv로 저장하고, 존재하지 않는 경우 None을 프린트, False를 반환합니다.
     """
+    assert os.path.exists(ensembled) != False, \
+        f"앙상블된 csv파일이 존재하지 않습니다. 입력된 파일명 : {ensembled}"
+    assert os.path.exists(best_model) != False, \
+        f"비교할 csv파일이 존재하지 않습니다. 입력된 파일명 : {best_model}"
+    
+    if ensembled == best_model:
+        print("입력된 두 파일명이 같습니다.")
+        return -1
+    
     target_A = pd.read_csv(ensembled)['pred_label']
     target_B = pd.read_csv(best_model)['pred_label']
     
@@ -67,14 +91,21 @@ def diff(ensembled, best_model):
             best_model.append(y)
 
     difference = pd.DataFrame({"id":id, "ensembled" : ensembled, "best_model" : best_model})
-    print(len(difference))
+    print(f"difference : {len(difference)}")
     if len(difference) == 0:
-        print("None")
+        print("차이가 존재하지 않습니다.")
         return -1
     else:
-        difference.to_csv("difference.csv")
-
-
+        yn = ""
+        if os.path.exists("difference.csv"):
+            while yn == "":
+                yn = input("difference.csv 파일이 존재합니다. 덮어쓰기[Y/N] : ")
+            if yn in ["Y", "y"]:
+                difference.to_csv("difference.csv")
+            elif yn in ["N", "n"]:
+                pass
+        else:
+            difference.to_csv("difference.csv")
 
 #diff("output.csv", "roberta_submission.csv")    
 
