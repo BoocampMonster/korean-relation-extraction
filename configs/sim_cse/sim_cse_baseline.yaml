@@ -5,9 +5,9 @@ data:
     weighted: True
     
 model:
-    model_name : klue/bert-base
+    model_name : klue/roberta-large
     data_class : BaselineDataset
-    model_class : BaselineModel
+    model_class : LastHiddenGRUModel
     trainer: SimCSEBaselineTrainer
     saved_dir: SimCSEBaseline
     loss : SimCSELoss
@@ -15,14 +15,15 @@ model:
         metric1 : klue_re_micro_f1
         metric2 : klue_re_auprc
     optimizer : AdamW
-    dropout_rate : 0.1
+    dropout_rate : 0.2
 
 train:
     seed: 42
     gpus: 1
-    batch_size: 2
-    max_epoch: 10
-    learning_rate: 5e-5
+    batch_size: 16
+    max_epoch: 3
+    learning_rate: 0.000005
     logging_step: 1
     max_length : 270
     sim_cse_temperature: 0.1
+    
