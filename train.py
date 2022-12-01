@@ -4,6 +4,8 @@ import pandas as pd
 import pickle
 from omegaconf import OmegaConf
 
+from torch.utils.data.sampler import WeightedRandomSampler
+import numpy as np
 from torch.utils.data.dataloader import DataLoader
 from transformers import AutoTokenizer
 from sklearn.model_selection import StratifiedKFold
@@ -47,7 +49,19 @@ def main():
         entity_marker_mode= config.data.get('entity_marker_mode'),
         max_length=config.train.max_length)
 
-    train_dataloader = DataLoader(train, batch_size= config.train.batch_size, pin_memory=True, shuffle=True)
+    if config.data.get('weighted'):
+        print('WeightedRandomSampler')
+        train_label = data.iloc[train_index,:]['label']
+        # https://github.com/wonjun-dev/AI-Paper-Reproduce/blob/master/simCSE-Pytorch/pretrain.py
+        # long tail distribution 를 고려해서 label이 균등한 미니배치를 구성하기 위해 weighted sampler 정의
+        class_sample_count = np.array([len(np.where(train_label == t)[0]) for t in np.unique(train_label)])
+        weight = 1. / class_sample_count
+        samples_weight = np.array([weight[t] for t in train_label])
+        samples_weight = torch.from_numpy(samples_weight).double()
+        sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
+        train_dataloader = DataLoader(train, batch_size= config.train.batch_size, pin_memory=True, sampler=sampler)
+    else:
+        train_dataloader = DataLoader(train, batch_size= config.train.batch_size, pin_memory=True, shuffle=True)
     valid_dataloader = DataLoader(valid, batch_size= config.train.batch_size, pin_memory=True, shuffle=False)
 
     assert torch.cuda.is_available(), "GPU를 사용할 수 없습니다."
