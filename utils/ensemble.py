@@ -16,7 +16,7 @@ label = ['no_relation', 'org:top_members/employees', 'org:members',
        'per:place_of_birth', 'per:place_of_death', 'org:founded_by',
        'per:religion']
 
-def ensemble(path_to_csv_folder = "ensemble", output = "output.csv"):
+def ensemble(path_to_csv_folder:str = "ensemble", output:str = "output.csv"):
     csv_names = []
     csv_dfs = []
     probs = []
@@ -64,7 +64,7 @@ def ensemble(path_to_csv_folder = "ensemble", output = "output.csv"):
 
     return new_df
 
-def diff(ensembled, best_model):
+def diff(ensembled:str, best_model:str):
     """
     현재 폴더의 (ensembled, best_model) 두 파일명을 받아 변경된 라벨이 있는 경우 이를 출력합니다.
     결과값이 존재하는 경우, csv로 저장하고, 존재하지 않는 경우 None을 프린트, False를 반환합니다.
@@ -106,8 +106,6 @@ def diff(ensembled, best_model):
                 pass
         else:
             difference.to_csv("difference.csv")
-
-#diff("output.csv", "roberta_submission.csv")    
 
 if __name__ == "__main__":
     """
